@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\UsersController;
+use App\Http\Controllers\Api\AuthenticationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,3 +24,6 @@ Route::apiResource('users', UsersController::class);
 
 
 Route::post('/activate-user', [UsersController::class, 'activateUser']);
+
+Route::post('/login',[AuthenticationController::class, 'login']);
+Route::post('/logout',[AuthenticationController::class, 'logout']);
