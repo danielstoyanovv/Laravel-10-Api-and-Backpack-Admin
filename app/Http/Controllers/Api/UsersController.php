@@ -31,38 +31,42 @@ class UsersController extends Controller
 
     /**Ф
      * @param UserCreateRequest $request
-     * @return UsersResource
+     * @return UsersResource|JsonResponse
      */
-    public function store(UserCreateRequest $request): UsersResource
+    public function store(UserCreateRequest $request): UsersResource|JsonResponse
     {
-        $usersImage = null;
-        if (!empty($request->input('image_content'))) {
-            $originalName = $request->input('image_content');
-            $imagesFolder = 'uploads/images';
-            $imageName = pathinfo($originalName, PATHINFO_FILENAME);
-            $uniqueImageName = $imageName . '-' . uniqid() . '.' . explode('.', $originalName)[1];
-            $usersImage = $imagesFolder . DIRECTORY_SEPARATOR . $uniqueImageName . '.' .
-                pathinfo($originalName, PATHINFO_EXTENSION);
-            $fullImagePath = public_path($imagesFolder) . DIRECTORY_SEPARATOR . $uniqueImageName . '.' .
-                pathinfo($originalName, PATHINFO_EXTENSION);
-            file_put_contents($fullImagePath,file_get_contents($originalName));
+        try {
+            $usersImage = null;
+            if (!empty($request->input('image_content'))) {
+                $originalName = $request->input('image_content');
+                $imagesFolder = 'uploads/images';
+                $imageName = pathinfo($originalName, PATHINFO_FILENAME);
+                $uniqueImageName = $imageName . '-' . uniqid() . '.' . explode('.', $originalName)[1];
+                $usersImage = $imagesFolder . DIRECTORY_SEPARATOR . $uniqueImageName . '.' .
+                    pathinfo($originalName, PATHINFO_EXTENSION);
+                $fullImagePath = public_path($imagesFolder) . DIRECTORY_SEPARATOR . $uniqueImageName . '.' .
+                    pathinfo($originalName, PATHINFO_EXTENSION);
+                file_put_contents($fullImagePath,file_get_contents($originalName));
+            }
+
+            $user = UserFactory::new([
+                'name' => $request->input('name'),
+                'email' => $request->input('email'),
+                'password' => Hash::make($request->input('password')),
+                'status' => 'inactive',
+                'image' => $usersImage ?? null,
+                'short_description' => $request->input('short_description'),
+                'token' => TokenGenerator::generate(),
+                'refresh_token' => TokenGenerator::generate(),
+                'expires_at' => Carbon::now()->addDay(),
+                'roles' => json_encode(["User"], true)
+
+            ])->create();
+
+            return new UsersResource($user);
+        } catch (\Exception $exception) {
+            return response()->json($exception->getMessage(), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         }
-
-        $user = UserFactory::new([
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'password' => Hash::make($request->input('password')),
-            'status' => 'inactive',
-            'image' => $usersImage ?? null,
-            'short_description' => $request->input('short_description'),
-            'token' => TokenGenerator::generate(),
-            'refresh_token' => TokenGenerator::generate(),
-            'expires_at' => Carbon::now()->addDay(),
-            'roles' => json_encode(["User"], true)
-
-        ])->create();
-
-        return new UsersResource($user);
     }
 
     /**
