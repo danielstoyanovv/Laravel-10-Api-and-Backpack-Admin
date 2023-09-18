@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\TokenGenerator;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\TokenUpdateRequest;
 use App\Http\Requests\UserActivateRequest;
 use App\Http\Requests\UserCreateRequest;
 use App\Models\User;
 use App\Http\Resources\UsersResource;
 use Database\Factories\UserFactory;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Illuminate\Http\JsonResponse;
+use Carbon\Carbon;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 
 class UsersController extends Controller
@@ -47,12 +49,17 @@ class UsersController extends Controller
         }
 
         $user = UserFactory::new([
-              'name' => $request->input('name'),
-              'email' => $request->input('email'),
-              'password' => Hash::make($request->input('password')),
-              'status' => 'inactive',
-              'image' => $usersImage ?? null,
-              'short_description' => $request->input('short_description')
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'password' => Hash::make($request->input('password')),
+            'status' => 'inactive',
+            'image' => $usersImage ?? null,
+            'short_description' => $request->input('short_description'),
+            'token' => TokenGenerator::generate(),
+            'refresh_token' => TokenGenerator::generate(),
+            'expires_at' => Carbon::now()->addDay(),
+            'roles' => json_encode(["User"], true)
+
         ])->create();
 
         return new UsersResource($user);
@@ -73,23 +80,46 @@ class UsersController extends Controller
      * @param UserActivateRequest $request
      * @return UsersResource|JsonResponse
      */
-    public function activateUser(UserActivateRequest $request): UsersResource|JsonResponse
+    public function activateUser(UserActivateRequest $request)
     {
-        $activateUserData = json_decode($request->getContent(), true);
-
         try {
-            if (!empty($activateUserData['id'])) {
-                if ($user = User::find($activateUserData['id'])) {
+            if ($userByToken = User::where(['token' => $request->input('token')])->first()) {
+                $userRoles = json_decode($userByToken->roles, true);
+                if (!in_array('Admin', $userRoles)) {
+                    throw new UnprocessableEntityHttpException('Only admin users can activate users');
+                }
+
+                if ($user = User::find($request->input('id'))) {
                     $user->update([
                         'status' => 'active'
                     ]);
                 }
                 return new UsersResource($user);
             }
-        } catch (\Exception $exception) {
-            Log::error($exception->getMessage());
+            throw new UnprocessableEntityHttpException('Token not found');
 
+        } catch (\Exception $exception) {
+            return response()->json($exception->getMessage(), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         }
-        return response()->json('User activation issue', ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    /**
+     * @param TokenUpdateRequest $request
+     * @return UsersResource|JsonResponse
+     */
+    public function tokenUpdate(TokenUpdateRequest $request): UsersResource|JsonResponse
+    {
+        try {
+            if ($user = User::where(['refresh_token' => $request->input('refresh_token')])->first()) {
+                $user->update([
+                    'token' => TokenGenerator::generate(),
+                    'expires_at' => Carbon::now()->addDay()
+                ]);
+                return new UsersResource($user);
+            }
+            throw new UnprocessableEntityHttpException('Token not found');
+        } catch (\Exception $exception) {
+            return response()->json($exception->getMessage(), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+        }
     }
 }

@@ -21,9 +21,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::apiResource('users', UsersController::class);
-
-
 Route::post('/activate-user', [UsersController::class, 'activateUser']);
+Route::post('/token-update', [UsersController::class, 'tokenUpdate']);
 
 Route::post('/login',[AuthenticationController::class, 'login']);
 Route::post('/logout',[AuthenticationController::class, 'logout']);

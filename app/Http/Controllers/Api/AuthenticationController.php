@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
+use App\Http\Resources\UsersResource;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Psr\SimpleCache\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
@@ -14,18 +16,16 @@ class AuthenticationController extends Controller
 {
     /**
      * @param LoginRequest $request
-     * @return JsonResponse
+     * @return UsersResource|JsonResponse
      */
-    public function login(LoginRequest $request): JsonResponse
+    public function login(LoginRequest $request): UsersResource|JsonResponse
     {
         $user = User::where([
             'email' => $request->input('email')
         ])->first();
 
-        $cacheKey = $user->id . '_logged_in';
-
-        if (cache()->has($cacheKey)) {
-            return response()->json('User is logged in', ResponseAlias::HTTP_OK);
+        if ($user->expires_at < Carbon::now()) {
+            return response()->json('Token is expired', ResponseAlias::HTTP_UNAUTHORIZED);
         }
 
         if(!Hash::check($request->input('password'), $user->password)) {
@@ -35,8 +35,7 @@ class AuthenticationController extends Controller
             return response()->json('User is not activated', ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        cache()->put($cacheKey, true, 86400);
-        return response()->json('User is logged in', ResponseAlias::HTTP_OK);
+        return new UsersResource($user);
     }
 
     /**
@@ -57,8 +56,6 @@ class AuthenticationController extends Controller
             return response()->json('User is not activated', ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $cacheKey = $user->id . '_logged_in';
-        cache()->delete($cacheKey);
         return response()->json('User is logged out', ResponseAlias::HTTP_OK);
     }
 }

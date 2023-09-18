@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserActivateRequest extends FormRequest
+class TokenUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,8 +24,7 @@ class UserActivateRequest extends FormRequest
     public function rules()
     {
         return [
-            'id' => 'required|max:150',
-            'token' => 'required|max:256'
+            'refresh_token' => 'required|max:256'
         ];
     }
 }

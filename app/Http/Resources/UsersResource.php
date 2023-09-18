@@ -22,7 +22,10 @@ class UsersResource extends JsonResource
                 'email' => $this->email,
                 'status' => $this->status,
                 'image' => $this->image,
-                'short_description' => $this->short_description
+                'short_description' => $this->short_description,
+                'token' => $this->token,
+                'refresh_token' => $this->refresh_token,
+                'expires_at' => $this->expires_at
             ]
         ];
     }
