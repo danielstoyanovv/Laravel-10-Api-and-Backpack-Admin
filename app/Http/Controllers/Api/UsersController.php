@@ -71,17 +71,6 @@ class UsersController extends Controller
     }
 
     /**
-     * @param User $user
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
-     */
-    public function destroy(User $user)
-    {
-        $user->delete();
-        return response(null, 204);
-    }
-
-
-    /**
      * @param UserActivateRequest $request
      * @return UsersResource|JsonResponse
      */

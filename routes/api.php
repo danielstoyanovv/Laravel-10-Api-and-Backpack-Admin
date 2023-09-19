@@ -33,6 +33,7 @@ Route::post('/logout',[AuthenticationController::class, 'logout']);
 Route::apiResource('posts', PostsController::class);
 Route::post('/post-like', [PostsController::class, 'postLike']);
 Route::post('/post-unlike', [PostsController::class, 'postUnLike']);
+Route::post('/deleted-at-clear', [PostsController::class, 'deletedAtClear']);
+
 
 Route::post('/profiles', [ProfilesController::class, 'index']);
-
