@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\TokenUpdateRequest;
 use App\Http\Requests\UserActivateRequest;
 use App\Http\Requests\UserCreateRequest;
+use App\Http\Requests\UserUpdateRequest;
 use App\Models\User;
 use App\Http\Resources\UsersResource;
 use Database\Factories\UserFactory;
@@ -115,9 +116,38 @@ class UsersController extends Controller
     {
         try {
             if ($user = User::where(['refresh_token' => $request->input('refresh_token')])->first()) {
+                if ($user->status === 'inactive') {
+                    throw new UnprocessableEntityHttpException('User is not activated');
+                }
+
                 $user->update([
                     'token' => TokenGenerator::generate(),
                     'expires_at' => Carbon::now()->addDay()
+                ]);
+                return new UsersResource($user);
+            }
+            throw new UnprocessableEntityHttpException('Token not found');
+        } catch (\Exception $exception) {
+            return response()->json($exception->getMessage(), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+        }
+    }
+
+
+    /**
+     * @param UserUpdateRequest $request
+     * @return UsersResource|JsonResponse
+     */
+    public function userUpdate(UserUpdateRequest $request): UsersResource|JsonResponse
+    {
+        try {
+            if ($user = User::where(['token' => $request->input('token')])->first()) {
+                if ($user->status === 'inactive') {
+                    throw new UnprocessableEntityHttpException('User is not activated');
+                }
+
+                $user->update([
+                    'name' => $request->input('name'),
+                    'short_description' => $request->input('short_description')
                 ]);
                 return new UsersResource($user);
             }
