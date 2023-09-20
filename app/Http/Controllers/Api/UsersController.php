@@ -37,7 +37,6 @@ class UsersController extends Controller
     public function store(UserCreateRequest $request): UsersResource|JsonResponse
     {
         try {
-            $usersImage = null;
             if (!empty($request->input('image_content'))) {
                 $originalName = $request->input('image_content');
                 $imagesFolder = 'uploads/images';
@@ -105,10 +104,6 @@ class UsersController extends Controller
     {
         try {
             if ($user = User::where(['refresh_token' => $request->input('refresh_token')])->first()) {
-                if ($user->status === 'inactive') {
-                    throw new UnprocessableEntityHttpException('User is not activated');
-                }
-
                 $user->update([
                     'token' => TokenGenerator::generate(),
                     'expires_at' => Carbon::now()->addDay()

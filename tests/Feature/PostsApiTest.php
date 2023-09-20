@@ -5,23 +5,9 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
-class UsersApiTest extends TestCase
+class PostsApiTest extends TestCase
 {
-    public function test_create_user()
-    {
-        $response = $this->postJson('/api/users', [
-            "name" => "Functional Test",
-            "email" => uniqid() . "@gmail.com",
-            "password" => "12345678",
-            "short_description" => "tttttttttttttttttttttttttttt",
-            //"image_content" => "http://127.0.0.1:8000/uploads/400.png"
-            //uncomment image_content when you update it with a real image path which exists on your server
-        ]);
-
-        $response->assertStatus(ResponseAlias::HTTP_CREATED);
-    }
-
-    public function test_activate_user()
+    public function test_creaet_post()
     {
         $response = $this->postJson('/api/users', [
             "name" => "Functional Test",
@@ -71,5 +57,14 @@ class UsersApiTest extends TestCase
         $contentActivateUser = json_decode($responseActivateUser->getContent(), true);
 
         $this->assertEquals('active', $contentActivateUser['data']['attributes']['status']);
+
+        $responseCreatePost = $this->postJson('/api/posts', [
+            'author' => 'Functional Test',
+            'content' => 'Functional Test',
+            'token' => $contentLogin2['data']['attributes']['token']
+        ]);
+        $contentCreatePost = json_decode($responseCreatePost->getContent(), true);
+        $this->assertEquals('Functional Test', $contentCreatePost['data']['attributes']['author']);
+        $this->assertEquals('Functional Test', $contentCreatePost['data']['attributes']['content']);
     }
 }

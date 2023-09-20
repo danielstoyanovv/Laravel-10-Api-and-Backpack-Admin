@@ -14,10 +14,31 @@ use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-
+use Illuminate\Http\Request;
 
 class PostsController extends Controller
 {
+    /**
+     * @param Request $request
+     * @return mixed
+     */
+    public function index(Request $request)
+    {
+        try {
+            if ($user = User::where(['token' => $request->input('token')])->first()) {
+
+                if ($user->status === 'inactive') {
+                    throw new UnprocessableEntityHttpException('User is not activated');
+                }
+                return Post::orderBy('id', 'DESC')->paginate(20);
+            }
+            throw new UnprocessableEntityHttpException('Token not found');
+
+        } catch (\Exception $exception) {
+            return response()->json($exception->getMessage(), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+        }
+    }
+
     /**
      * @param PostCreateRequest $request
      * @return PostsResource|JsonResponse
@@ -143,7 +164,4 @@ class PostsController extends Controller
             return response()->json($exception->getMessage(), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         }
     }
-
-
-
 }

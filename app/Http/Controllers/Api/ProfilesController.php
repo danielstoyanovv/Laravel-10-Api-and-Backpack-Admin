@@ -9,7 +9,6 @@ use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
-
 class ProfilesController extends Controller
 {
     /**
