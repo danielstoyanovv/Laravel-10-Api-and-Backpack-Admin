@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Helpers\TokenGenerator;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TokenUpdateRequest;
 use App\Http\Requests\UserActivateRequest;
@@ -12,11 +11,14 @@ use App\Models\User;
 use App\Http\Resources\UsersResource;
 use Database\Factories\UserFactory;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Illuminate\Http\JsonResponse;
 use Carbon\Carbon;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-
+use Laravel\Passport\ClientRepository;
+use Illuminate\Support\Facades\Http;
+use League\OAuth2\Server\ResponseTypes\BearerTokenResponse;
 
 class UsersController extends Controller
 {
@@ -30,14 +32,16 @@ class UsersController extends Controller
         )->get());
     }
 
-    /**Ф
+    /**
      * @param UserCreateRequest $request
-     * @return UsersResource|JsonResponse
+     * @param ClientRepository $clientRepository
+     * @return JsonResponse
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function store(UserCreateRequest $request): UsersResource|JsonResponse
+    public function store(UserCreateRequest $request, ClientRepository $clientRepository,
+                          BearerTokenResponse $bearerTokenResponse): JsonResponse
     {
-        try {
-            if (!empty($request->input('image_content'))) {
+        if (!empty($request->input('image_content'))) {
                 $originalName = $request->input('image_content');
                 $imagesFolder = 'uploads/images';
                 $imageName = pathinfo($originalName, PATHINFO_FILENAME);
@@ -55,18 +59,36 @@ class UsersController extends Controller
                 'password' => Hash::make($request->input('password')),
                 'status' => 'inactive',
                 'image' => $usersImage ?? null,
-                'short_description' => $request->input('short_description'),
-                'token' => TokenGenerator::generate(),
-                'refresh_token' => TokenGenerator::generate(),
-                'expires_at' => Carbon::now()->addDay(),
-                'roles' => json_encode(["User"], true)
-
+                'short_description' => $request->input('short_description')
             ])->create();
 
-            return new UsersResource($user);
+            $accessToken = $user->createToken('MyApp')->accessToken;
+
+           // var_dump( Carbon::now()->addYear(+1)->toDateString() . " 00:00:00");
+           // die;
+            $success['token'] = $accessToken;
+            $success['name'] =  $user->name;
+
+
+        $newClient = $clientRepository->create($user->id, $user->name, '');
+
+        try {
+            $responseToken = Http::post('http://127.0.0.1:8000/oauth/token', [
+                "grant_type" => "password",
+                "client_id" => 2,
+                "client_secret" => "v1kM20tnU191sH8emmS9FZiMOC6VgDrSGcn1ZQUx",
+                "username" => "superAdmin8674@gmail.com",
+                "password" => "12345678",
+                "scope" => "",
+            ]);
+            $tokenResult = json_decode($responseToken->body(), true);
+            var_dump($tokenResult);
         } catch (\Exception $exception) {
-            return response()->json($exception->getMessage(), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+            die($exception->getMessage());
+            Log::error($exception->getMessage());
         }
+
+        return response()->json(['success'=>$success], ResponseAlias::HTTP_CREATED);
     }
 
     /**
