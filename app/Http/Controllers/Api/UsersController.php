@@ -32,16 +32,11 @@ class UsersController extends Controller
         )->get());
     }
 
-    /**
-     * @param UserCreateRequest $request
-     * @param ClientRepository $clientRepository
-     * @return JsonResponse
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    public function store(UserCreateRequest $request, ClientRepository $clientRepository,
-                          BearerTokenResponse $bearerTokenResponse): JsonResponse
+
+    public function store(UserCreateRequest $request)
     {
-        if (!empty($request->input('image_content'))) {
+        try {
+            if (!empty($request->input('image_content'))) {
                 $originalName = $request->input('image_content');
                 $imagesFolder = 'uploads/images';
                 $imageName = pathinfo($originalName, PATHINFO_FILENAME);
@@ -63,32 +58,13 @@ class UsersController extends Controller
             ])->create();
 
             $accessToken = $user->createToken('MyApp')->accessToken;
-
-           // var_dump( Carbon::now()->addYear(+1)->toDateString() . " 00:00:00");
-           // die;
             $success['token'] = $accessToken;
             $success['name'] =  $user->name;
-
-
-        $newClient = $clientRepository->create($user->id, $user->name, '');
-
-        try {
-            $responseToken = Http::post('http://127.0.0.1:8000/oauth/token', [
-                "grant_type" => "password",
-                "client_id" => 2,
-                "client_secret" => "v1kM20tnU191sH8emmS9FZiMOC6VgDrSGcn1ZQUx",
-                "username" => "superAdmin8674@gmail.com",
-                "password" => "12345678",
-                "scope" => "",
-            ]);
-            $tokenResult = json_decode($responseToken->body(), true);
-            var_dump($tokenResult);
+            return new UsersResource($user);
         } catch (\Exception $exception) {
-            die($exception->getMessage());
             Log::error($exception->getMessage());
+            return response()->json(['error' => 'Something happened'], ResponseAlias::HTTP_BAD_REQUEST);
         }
-
-        return response()->json(['success'=>$success], ResponseAlias::HTTP_CREATED);
     }
 
     /**

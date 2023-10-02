@@ -4,38 +4,37 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
-use App\Http\Resources\UsersResource;
 use App\Models\User;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Psr\SimpleCache\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Session;
 
 class AuthenticationController extends Controller
 {
     /**
-     * @param LoginRequest $request
-     * @return UsersResource|JsonResponse
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function login(LoginRequest $request): UsersResource|JsonResponse
+    public function login(LoginRequest $request):  JsonResponse
     {
-        $user = User::where([
+        if ($user = User::where([
             'email' => $request->input('email')
-        ])->first();
+        ])->first()) {
 
-        if ($user->expires_at < Carbon::now()) {
-            return response()->json('Token is expired', ResponseAlias::HTTP_UNAUTHORIZED);
+            if ($user->status === 'inactive') {
+                return response()->json(['error' => 'User is inactive'], ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+            }
         }
 
-        if(!Hash::check($request->input('password'), $user->password)) {
-            return response()->json('User unauthorized', ResponseAlias::HTTP_UNAUTHORIZED);
-        }
-        if ($user->status === 'inactive') {
-            return response()->json('User is not activated', ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+        if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
+            $token = auth()->user()->createToken('MyApp')->accessToken;
+            return response()->json(['success' => 'logged in'], ResponseAlias::HTTP_OK);
         }
 
-        return new UsersResource($user);
+        return response()->json(['error' => 'Unauthorised'], ResponseAlias::HTTP_UNAUTHORIZED);
     }
 
     /**
@@ -45,17 +44,16 @@ class AuthenticationController extends Controller
      */
     public function logout(LoginRequest $request): JsonResponse
     {
-        $user = User::where([
+
+        if ($user = User::where([
             'email' => $request->input('email')
-        ])->first();
-
-        if(!Hash::check($request->input('password'), $user->password)) {
-            return response()->json('User unauthorized', ResponseAlias::HTTP_UNAUTHORIZED);
+        ])->first()) {
+            if ($user->status === 'inactive') {
+                return response()->json(['error' => 'User is inactive'], ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+            }
         }
-        if ($user->status === 'inactive') {
-            return response()->json('User is not activated', ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
-        return response()->json('User is logged out', ResponseAlias::HTTP_OK);
+        Auth::logout();
+        Session::flush();
+        return response()->json(['success' => 'logged out'], ResponseAlias::HTTP_OK);
     }
 }

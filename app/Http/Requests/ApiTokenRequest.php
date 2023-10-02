@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ProfileRequest extends FormRequest
+class ApiTokenRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -16,7 +16,7 @@ class ProfileRequest extends FormRequest
         return true;
     }
 
-    /**
+    /**s
      * Get the validation rules that apply to the request.
      *
      * @return array
@@ -24,7 +24,8 @@ class ProfileRequest extends FormRequest
     public function rules()
     {
         return [
-            'token' => 'required|max:256'
+            'email' => 'required|email|max:150',
+            'password' => 'required|max:150|min:8'
         ];
     }
 }

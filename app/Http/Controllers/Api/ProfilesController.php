@@ -3,24 +3,25 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ProfileRequest;
+use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Illuminate\Support\Facades\Auth;
 
 class ProfilesController extends Controller
 {
     /**
-     * @param ProfileRequest $request
+     * @param Request $request
      * @return JsonResponse
      */
-    public function index(ProfileRequest $request): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        try {
-            if ($user = User::where(['token' => $request->input('token')])->first()) {
+        var_dump(auth()->user()->id);
+        die;
+        if ($user = auth()->user()) {
                 if ($user->status === 'inactive') {
-                    throw new UnprocessableEntityHttpException('User is not activated');
+                    return response()->json(['error' => 'User is inactive'], ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
                 }
 
                 $totalLikes = 0;
@@ -30,19 +31,13 @@ class ProfilesController extends Controller
                         $totalLikes += count($likedFrom);
                     }
                 }
-
                 $data = [
-                    'total_likes' => $totalLikes,
-                    'total_posts' => $user->posts->count()
-                ];
-
+                    'user' => [
+                        'total_likes' => $totalLikes,
+                        'total_posts' => $user->posts->count()
+                ]];
                 return response()->json($data);
-
             }
-            throw new UnprocessableEntityHttpException('Token not found');
-
-        } catch (\Exception $exception) {
-            return response()->json($exception->getMessage(), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
-        }
+            return response()->json(['error' => 'User is not logged in'], ResponseAlias::HTTP_UNAUTHORIZED);
     }
 }
