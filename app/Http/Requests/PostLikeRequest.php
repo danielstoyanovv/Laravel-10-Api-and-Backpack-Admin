@@ -25,7 +25,6 @@ class PostLikeRequest extends FormRequest
     {
         return [
             'id' => 'required|max:100',
-            'token' => 'required|max:256'
         ];
     }
 }

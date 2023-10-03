@@ -25,8 +25,7 @@ class PostCreateRequest extends FormRequest
     {
         return [
             'author' => 'required|max:100',
-            'content' => 'required|max:500',
-            'token' => 'required|max:256'
+            'content' => 'required|max:500'
         ];
     }
 }

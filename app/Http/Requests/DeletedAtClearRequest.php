@@ -24,8 +24,7 @@ class DeletedAtClearRequest extends FormRequest
     public function rules()
     {
         return [
-            'id' => 'required|max:100',
-            'token' => 'required|max:256'
+            'id' => 'required|max:100'
         ];
     }
 }
