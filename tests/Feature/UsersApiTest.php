@@ -2,73 +2,49 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
+use Laravel\Passport\ClientRepository;
 
 class UsersApiTest extends TestCase
 {
+    use BaseTest;
+
     public function test_create_user()
     {
-        $response = $this->postJson('/api/users', [
-            "name" => "Functional Test",
-            "email" => uniqid() . "@gmail.com",
-            "password" => "12345678",
-            "short_description" => "tttttttttttttttttttttttttttt",
-            //"image_content" => "http://127.0.0.1:8000/uploads/400.png"
-            //uncomment image_content when you update it with a real image path which exists on your server
-        ]);
-
+        $response = $this->createUser();
         $response->assertStatus(ResponseAlias::HTTP_CREATED);
     }
 
     public function test_activate_user()
     {
-        $response = $this->postJson('/api/users', [
-            "name" => "Functional Test",
-            "email" => uniqid() . "@gmail.com",
-            "password" => "12345678",
-            "short_description" => "tttttttttttttttttttttttttttt"
-        ]);
+        $response = $this->createUser();
         $response->assertStatus(ResponseAlias::HTTP_CREATED);
         $content = json_decode($response->getContent(), true);
 
-        $response = $this->postJson('/api/activate-user', [
+        $responseLogin = $this->loginUser('superAdmin8674@gmail.com', '12345678');
+        $responseLogin->assertStatus(ResponseAlias::HTTP_OK);
+
+        $clientRepository = new ClientRepository();
+        $authUserId = auth()->user()->id;
+        if (!empty($clientRepository->forUser($authUserId))) {
+            $client = $clientRepository->forUser($authUserId)->first();
+        } else {
+            $client = $clientRepository->create(
+                $authUserId, auth()->user()->name, '', null, false, true
+            );
+        }
+        $responseToken = $this->createUserToken($client, auth()->user()->email);
+        $responseBody = json_decode($responseToken->getContent(), true);
+
+        $token = $responseBody['access_token'];
+
+        $responseActivate = Http::withToken($token)->post('http://127.0.0.1:8000/api/activate-user', [
             "id" => $content['data']['id']
         ]);
 
-        $response->assertStatus(ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
-
-        $response = $this->postJson('/api/activate-user', [
-            "id" => $content['data']['id'],
-            "token" => 123
-        ]);
-
-        $response->assertStatus(ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
-
-        $responseLogin = $this->postJson('/api/login', [
-            'email' => 'superAdmin8674@gmail.com',
-            'password' => '12345678',
-        ]);
-        $response->assertStatus(ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
-
-        $responseTokenUpdate = $this->postJson('/api/token-update', [
-            'refresh_token' => 'iupebvxumu8g8k4o00oc4ook408sw0w'
-        ]);
-        $contentTokenUpdate = json_decode($responseTokenUpdate->getContent(), true);
-        $responseTokenUpdate->assertStatus(ResponseAlias::HTTP_OK);
-
-        $responseLogin2 = $this->postJson('/api/login', [
-            'email' => 'superAdmin8674@gmail.com',
-            'password' => '12345678',
-        ]);
-        $contentLogin2 = json_decode($responseLogin2->getContent(), true);
-
-        $responseActivateUser = $this->postJson('/api/activate-user', [
-            "id" => $content['data']['id'],
-            "token" => $contentLogin2['data']['attributes']['token']
-        ]);
-
-        $contentActivateUser = json_decode($responseActivateUser->getContent(), true);
+        $contentActivateUser = json_decode($responseActivate->body(), true);
 
         $this->assertEquals('active', $contentActivateUser['data']['attributes']['status']);
     }

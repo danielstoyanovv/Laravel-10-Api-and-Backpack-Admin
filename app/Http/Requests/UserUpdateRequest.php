@@ -26,7 +26,6 @@ class UserUpdateRequest extends FormRequest
         return [
             'name' => 'required|max:150',
             'short_description' => 'required|max:500',
-            'token' => 'required|max:256'
         ];
     }
 }

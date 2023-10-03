@@ -24,8 +24,7 @@ class UserActivateRequest extends FormRequest
     public function rules()
     {
         return [
-            'id' => 'required|max:150',
-            'token' => 'required|max:256'
+            'id' => 'required|max:150'
         ];
     }
 }

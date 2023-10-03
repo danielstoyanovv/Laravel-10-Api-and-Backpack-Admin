@@ -19,7 +19,8 @@ class  CreateSuperUsersSeeder extends Seeder
         UserFactory::new([
             'name' => 'Admin',
             'email' => 'superAdmin8674@gmail.com',
-            'password' => Hash::make("12345678")
+            'password' => Hash::make("12345678"),
+            'is_admin' => 1
         ])->create();
     }
 }

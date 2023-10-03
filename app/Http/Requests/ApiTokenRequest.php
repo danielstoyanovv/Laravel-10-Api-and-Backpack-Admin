@@ -24,7 +24,7 @@ class ApiTokenRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => 'required|email|max:150',
+            'email' => 'required|email:filter|max:150',
             'password' => 'required|max:150|min:8'
         ];
     }

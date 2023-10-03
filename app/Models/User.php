@@ -26,9 +26,7 @@ class User extends Authenticatable
         'roles',
         'image',
         'short_description',
-        'token',
-        'refresh_token',
-        'expires_at'
+        'is_admin'
     ];
 
     /**

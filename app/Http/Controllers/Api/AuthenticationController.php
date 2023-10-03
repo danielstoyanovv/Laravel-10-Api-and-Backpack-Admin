@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ApiData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Models\User;
@@ -14,6 +15,10 @@ use Illuminate\Support\Facades\Session;
 
 class AuthenticationController extends Controller
 {
+    public function __construct(private ApiData $apiData)
+    {
+    }
+
     /**
      * @param Request $request
      * @return JsonResponse
@@ -23,8 +28,7 @@ class AuthenticationController extends Controller
         if ($user = User::where([
             'email' => $request->input('email')
         ])->first()) {
-
-            if ($user->status === 'inactive') {
+            if (!$this->apiData->isUserActive($user)) {
                 return response()->json(['error' => 'User is inactive'], ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
             }
         }
@@ -48,7 +52,7 @@ class AuthenticationController extends Controller
         if ($user = User::where([
             'email' => $request->input('email')
         ])->first()) {
-            if ($user->status === 'inactive') {
+            if (!$this->apiData->isUserActive($user)) {
                 return response()->json(['error' => 'User is inactive'], ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
             }
         }
