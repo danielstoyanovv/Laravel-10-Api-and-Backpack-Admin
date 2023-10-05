@@ -11,6 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\UploadedFile;
 
 class User extends Authenticatable
 {
@@ -67,9 +68,7 @@ class User extends Authenticatable
      */
     public function setImageAttribute($value)
     {
-        if ($value instanceof \Illuminate\Http\UploadedFile) {
-            $this->attributes['image'] = Upload::process($value);
-        }
+        $this->attributes['image'] = $value instanceof UploadedFile ? Upload::process($value) : $value;
     }
 
     /**
