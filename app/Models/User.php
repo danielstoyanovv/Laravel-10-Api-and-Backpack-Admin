@@ -67,7 +67,9 @@ class User extends Authenticatable
      */
     public function setImageAttribute($value)
     {
-        $this->attributes['image'] = Upload::process($value);
+        if ($value instanceof \Illuminate\Http\UploadedFile) {
+            $this->attributes['image'] = Upload::process($value);
+        }
     }
 
     /**

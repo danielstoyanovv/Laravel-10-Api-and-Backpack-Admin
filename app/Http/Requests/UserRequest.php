@@ -26,7 +26,7 @@ class UserRequest extends FormRequest
     {
         return [
             'name' => 'required|max:150',
-            'email' => 'required|email:filter|max:150|unique:users',
+            'email' => 'required|email:filter|max:150',
             'password' => 'required|max:150|min:8',
             'image' => 'mimes:jpg,bmp,png,gif,jpeg,webp|max:5000',
             'short_description' => 'required|max:500'

@@ -18,7 +18,7 @@ class UserRepository
         return UserFactory::new([
             'name' => request('name'),
             'email' => request('email'),
-            'password' => Hash::make(request('password')),
+            'password' => request('password'),
             'status' => 'inactive',
             'image' => $userImage,
             'short_description' => request('short_description')
