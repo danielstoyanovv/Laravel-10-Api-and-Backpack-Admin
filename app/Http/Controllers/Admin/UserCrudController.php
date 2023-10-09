@@ -68,9 +68,7 @@ class UserCrudController extends CrudController
         CRUD::field('name');
         CRUD::field('email');
         CRUD::field('password');
-        CRUD::field('status');
         CRUD::field('roles');
-    //    CRUD::field('image');
         CRUD::field('short_description');
         CRUD::field('is_admin');
 
@@ -81,6 +79,17 @@ class UserCrudController extends CrudController
             'upload' => true
         ]);
 
+        $this->crud->addField([
+            'name' => 'status',
+            'label' => "Status",
+            'type' => 'select_from_array',
+            'options' => [
+                'active' => 'Active',
+                'inactive' => 'Inactive'
+            ],
+            'allows_null' => false,
+            'default'     => 'inactive',
+        ]);
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:
