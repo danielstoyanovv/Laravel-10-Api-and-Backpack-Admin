@@ -5,14 +5,15 @@ namespace App\Repositories;
 use App\Interfaces\PostRepositoryInterface;
 use App\Models\User;
 use Database\Factories\PostFactory;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 class PostRepository implements PostRepositoryInterface
 {
     /**
-     * @param User $user
+     * @param User|Authenticatable $user
      * @return mixed
      */
-    public function create(User $user): mixed
+    public function create(User|Authenticatable $user): mixed
     {
         return  PostFactory::new([
             'author' => request('author'),

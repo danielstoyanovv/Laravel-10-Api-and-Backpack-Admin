@@ -3,12 +3,13 @@
 namespace App\Interfaces;
 
 use App\Models\User;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 interface PostRepositoryInterface
 {
     /**
-     * @param User $user
+     * @param User|Authenticatable $user
      * @return mixed
      */
-    public function create(User $user): mixed;
+    public function create(User|Authenticatable $user): mixed;
 }

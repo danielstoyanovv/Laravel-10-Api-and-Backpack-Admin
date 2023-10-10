@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Passport\Client;
 use Laravel\Passport\ClientRepository;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 class ApiData
 {
@@ -18,10 +19,10 @@ class ApiData
     }
 
     /**
-     * @param User $user
+     * @param User|Authenticatable $user
      * @return bool
      */
-    public function isUserActive(User $user): bool
+    public function isUserActive(User|Authenticatable $user): bool
     {
         return $user->status === 'active';
     }
