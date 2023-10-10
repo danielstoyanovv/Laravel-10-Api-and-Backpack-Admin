@@ -2,9 +2,10 @@
 
 namespace App\Services;
 
+use App\Interfaces\ApiTokenServiceInterface;
 use Illuminate\Support\Facades\Http;
 
-class ApiTokenService
+class ApiTokenService implements ApiTokenServiceInterface
 {
     public $clientId;
     public $clientSecret;

@@ -6,21 +6,22 @@ use App\Helpers\ApiData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ApiTokenRequest;
 use App\Models\User;
-use App\Services\ApiTokenService;
+use App\Interfaces\ApiTokenServiceInterface;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Illuminate\Http\JsonResponse;
 use Laravel\Passport\ClientRepository;
+use Illuminate\Support\Facades\App;
 
 class ApiTokensController extends Controller
 {
     /**
      * @param ApiTokenRequest $request
      * @param ClientRepository $clientRepository
+     * @param ApiData $apiData
      * @return JsonResponse
      */
-    public function token(ApiTokenRequest $request, ClientRepository $clientRepository, ApiData $apiData,
-                          ApiTokenService $apiTokenService): JsonResponse
+    public function token(ApiTokenRequest $request, ClientRepository $clientRepository, ApiData $apiData): JsonResponse
     {
         try {
             if (!$apiData->checkUserCredentials()) {
@@ -31,6 +32,7 @@ class ApiTokensController extends Controller
                      return response()->json(['error' => 'User is inactive'], ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
                  }
                  $client = $apiData->getOrCreatePassportClient($clientRepository, $user);
+                 $apiTokenService = App::make(ApiTokenServiceInterface::class);
                  $tokenResult = $apiTokenService
                      ->setClientId($client->id)
                      ->setClientSecret($client->secret)
