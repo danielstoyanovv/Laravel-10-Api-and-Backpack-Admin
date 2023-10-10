@@ -2,10 +2,11 @@
 
 namespace App\Repositories;
 
+use App\Interfaces\PostRepositoryInterface;
 use App\Models\User;
 use Database\Factories\PostFactory;
 
-class PostRepository
+class PostRepository implements PostRepositoryInterface
 {
     /**
      * @param User $user

@@ -2,13 +2,13 @@
 
 namespace App\Repositories;
 
-use Database\Factories\UserFactory;
-use Illuminate\Support\Facades\Hash;
+use App\Interfaces\UserRepositoryInterfaces;
 use App\Models\User;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
-class UserRepository
+class UserRepository implements UserRepositoryInterfaces
 {
     /**
      * @return User|Collection|Model|mixed
