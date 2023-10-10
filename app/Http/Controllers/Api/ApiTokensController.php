@@ -31,8 +31,12 @@ class ApiTokensController extends Controller
                      return response()->json(['error' => 'User is inactive'], ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
                  }
                  $client = $apiData->getOrCreatePassportClient($clientRepository, $user);
-                 $tokenResult = $apiTokenService->getBearer($client->id, $client->secret, $user->email,
-                    request('password'));
+                 $tokenResult = $apiTokenService
+                     ->setClientId($client->id)
+                     ->setClientSecret($client->secret)
+                     ->setEmail($user->email)
+                     ->setPassword(request('password'))
+                     ->getBearer();
                 $success['success'] = true;
                 $success['token'] = $tokenResult['access_token'];
                 return response()->json([$success], ResponseAlias::HTTP_OK);
