@@ -50,7 +50,7 @@ class ApiTokenService implements ApiTokenServiceInterface
     public function getBearer()
     {
         $responseToken = Http::timeout(9999999)->post('http://127.0.0.1:8000/oauth/token', [
-            "grant_type" => "password",
+            "grant_type" => "authorization_code",
             "client_id" => $this->clientId,
             "client_secret" => $this->clientSecret,
             "username" => $this->email,
