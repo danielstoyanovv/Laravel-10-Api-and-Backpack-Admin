@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Helpers;
 
 use App\Models\User;
@@ -28,10 +30,10 @@ class ApiData
     }
 
     /**
-     * @param string $id
+     * @param int $id
      * @return bool
      */
-    public function isUserAdmin(string $id): bool
+    public function isUserAdmin(int $id): bool
     {
         $user = User::find($id);
         return $user->is_admin === 1;
