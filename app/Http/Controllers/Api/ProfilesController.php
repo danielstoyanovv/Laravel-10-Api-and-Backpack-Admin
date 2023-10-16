@@ -25,7 +25,7 @@ class ProfilesController extends Controller
 
             $totalLikes = 0;
             foreach ($user->posts as $post) {
-                $likedFrom = json_decode($post->liked_from, true);
+                $likedFrom = json_decode((string) $post->liked_from, true);
                 if (!empty($likedFrom)) {
                     $totalLikes += count($likedFrom);
                 }

@@ -16,6 +16,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $loader = AliasLoader::getInstance();
         $loader->alias('Backpack\CRUD\app\Http\Controllers\AdminController', 'App\Http\Controllers\Backpack\CRUD\AdminController');
+        $this->app->register(RepositoryServiceProvider::class);
     }
 
     /**

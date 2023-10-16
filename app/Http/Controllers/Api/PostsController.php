@@ -10,13 +10,17 @@ use App\Http\Requests\DeletedAtClearRequest;
 use App\Http\Requests\PostCreateRequest;
 use App\Http\Requests\PostLikeRequest;
 use App\Http\Resources\PostsResource;
+use App\Interfaces\PostRepositoryInterface;
 use App\Models\Post;
-use App\Repositories\PostRepository;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class PostsController extends Controller
 {
@@ -26,9 +30,9 @@ class PostsController extends Controller
 
     /**
      * @param Request $request
-     * @return JsonResponse
+     * @return JsonResponse|LengthAwarePaginator
      */
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse|LengthAwarePaginator
     {
         if ($user = auth()->user()) {
             if (!$this->apiData->isUserActive($user)) {
@@ -42,10 +46,10 @@ class PostsController extends Controller
 
     /**
      * @param PostCreateRequest $request
-     * @param PostRepository $repository
+     * @param PostRepositoryInterface $repository
      * @return PostsResource|JsonResponse
      */
-    public function store(PostCreateRequest $request, PostRepository $repository): PostsResource|JsonResponse
+    public function store(PostCreateRequest $request, PostRepositoryInterface $repository): PostsResource|JsonResponse
     {
         try {
             if ($user = auth()->user()) {
@@ -80,7 +84,7 @@ class PostsController extends Controller
 
                     $newLike = [$user->id];
                     $post->update([
-                        'liked_from' => json_encode(array_merge($newLike, $cuffentLikedFrom), true)
+                        'liked_from' => json_encode(array_merge($newLike, $cuffentLikedFrom))
                     ]);
                     return new PostsResource($post);
                 }
@@ -112,7 +116,7 @@ class PostsController extends Controller
                         unset($cuffentLikedFrom[$key]);
                     }
                     $post->update([
-                        'liked_from' => json_encode(array_merge($cuffentLikedFrom), true)
+                        'liked_from' => json_encode(array_merge($cuffentLikedFrom))
                     ]);
                     return new PostsResource($post);
                 }
@@ -125,7 +129,11 @@ class PostsController extends Controller
             return response()->json(['error' => 'Something happened'], ResponseAlias::HTTP_BAD_REQUEST);        }
     }
 
-    public function destroy(Post $post)
+    /**
+     * @param Post $post
+     * @return Application|ResponseFactory|Response
+     */
+    public function destroy(Post $post): Application|ResponseFactory|Response
     {
         $post->delete();
         return response(null, 204);

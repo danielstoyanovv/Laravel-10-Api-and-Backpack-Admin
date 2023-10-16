@@ -9,9 +9,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UserActivateRequest;
 use App\Http\Requests\UserCreateRequest;
 use App\Http\Requests\UserUpdateRequest;
+use App\Interfaces\UserRepositoryInterfaces;
 use App\Models\User;
 use App\Http\Resources\UsersResource;
-use App\Repositories\UserRepository;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Illuminate\Http\JsonResponse;
@@ -19,17 +20,21 @@ use Illuminate\Http\JsonResponse;
 class UsersController extends Controller
 {
     /**
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
-    public function index()
+    public function index(): AnonymousResourceCollection
     {
         return UsersResource::collection(User::where(
             'name', '!=', 'Admin'
         )->get());
     }
 
-
-    public function store(UserCreateRequest $request, UserRepository $repository)
+    /**
+     * @param UserCreateRequest $request
+     * @param UserRepositoryInterfaces $repository
+     * @return UsersResource|JsonResponse
+     */
+    public function store(UserCreateRequest $request, UserRepositoryInterfaces $repository): UsersResource|JsonResponse
     {
         try {
             $usersImage = $this->handleImage();
