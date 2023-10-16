@@ -32,10 +32,10 @@ class PostsApiTest extends TestCase
                 $authUserId, auth()->user()->name, '', null, false, true
             );
         }
-        $responseToken = $this->createUserToken($client, auth()->user()->email);
+        $responseToken = $this->createUserToken(auth()->user()->email, 12345678);
         $responseBody = json_decode($responseToken->getContent(), true);
 
-        $token = $responseBody['access_token'];
+        $token = $responseBody['token'];
 
         $responseActivate = Http::withToken($token)->post('http://127.0.0.1:8000/api/activate-user', [
             "id" => $userId
@@ -52,10 +52,10 @@ class PostsApiTest extends TestCase
             $userId, $userName, '', null, false, true
         );
 
-        $userResponseToken = $this->createUserToken($userClient, $userEmail);
+        $userResponseToken = $this->createUserToken($userEmail, '12345678');
         $userResponseBody = json_decode($userResponseToken->getContent(), true);
 
-        $userToken = $userResponseBody['access_token'];
+        $userToken = $userResponseBody['token'];
 
         $responsePosts = Http::withToken($userToken)->post('http://127.0.0.1:8000/api/posts', [
             'author' => 'New Functional Test',

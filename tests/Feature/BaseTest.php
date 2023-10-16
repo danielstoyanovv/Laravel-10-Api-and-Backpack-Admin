@@ -26,15 +26,11 @@ trait BaseTest
         ]);
     }
 
-    public function createUserToken(Client $client, string $email)
+    public function createUserToken(string $email, string $password)
     {
-        return $this->postJson('/oauth/token', [
-            "grant_type" => "password",
-            "client_id" => $client->id,
-            "client_secret" => $client->secret,
-            "username" => $email,
-            "password" => '12345678',
-            "scope" => "",
+        return $this->postJson('/api/token', [
+            'email' => $email,
+            'password' =>  $password
         ]);
     }
 }

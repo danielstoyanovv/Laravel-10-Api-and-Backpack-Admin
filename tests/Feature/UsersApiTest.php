@@ -35,10 +35,9 @@ class UsersApiTest extends TestCase
                 $authUserId, auth()->user()->name, '', null, false, true
             );
         }
-        $responseToken = $this->createUserToken($client, auth()->user()->email);
+        $responseToken = $this->createUserToken(auth()->user()->email, '12345678');
         $responseBody = json_decode($responseToken->getContent(), true);
-
-        $token = $responseBody['access_token'];
+        $token = $responseBody['token'];
 
         $responseActivate = Http::withToken($token)->post('http://127.0.0.1:8000/api/activate-user', [
             "id" => $content['data']['id']

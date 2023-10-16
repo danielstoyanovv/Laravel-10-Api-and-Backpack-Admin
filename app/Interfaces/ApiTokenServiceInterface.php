@@ -5,10 +5,10 @@ namespace App\Interfaces;
 interface ApiTokenServiceInterface
 {
     /**
-     * @param string $clientId
-     * @return $this
+     * @param int $clientId
+     * @return \App\Services\ApiTokenService
      */
-    public function setClientId(string $clientId): \App\Services\ApiTokenService;
+    public function setClientId(int $clientId): \App\Services\ApiTokenService;
 
     /**
      * @param string $clientSecret

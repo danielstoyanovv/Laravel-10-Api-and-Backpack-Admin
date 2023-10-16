@@ -41,9 +41,10 @@ class ApiTokensController extends Controller
                      ->setEmail($user->email)
                      ->setPassword(request('password'))
                      ->getBearer();
-                $success['success'] = true;
-                $success['token'] = $tokenResult['access_token'];
-                return response()->json([$success], ResponseAlias::HTTP_OK);
+                return response()->json([
+                    'success' => 1,
+                    'token' => $tokenResult['access_token']
+                ], ResponseAlias::HTTP_OK);
             }
             return response()->json(['error' => 'User not found'], ResponseAlias::HTTP_NOT_FOUND);
         } catch (\Exception $exception) {

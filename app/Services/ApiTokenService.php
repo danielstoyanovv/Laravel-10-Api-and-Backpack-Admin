@@ -15,10 +15,10 @@ class ApiTokenService implements ApiTokenServiceInterface
     public $password;
 
     /**
-     * @param string $clientId
+     * @param int $clientId
      * @return $this
      */
-    public function setClientId(string $clientId): self
+    public function setClientId(int $clientId): self
     {
         $this->clientId = $clientId;
         return $this;
@@ -52,7 +52,7 @@ class ApiTokenService implements ApiTokenServiceInterface
     public function getBearer()
     {
         $responseToken = Http::timeout(9999999)->post('http://127.0.0.1:8000/oauth/token', [
-            "grant_type" => "authorization_code",
+            "grant_type" => "password",
             "client_id" => $this->clientId,
             "client_secret" => $this->clientSecret,
             "username" => $this->email,
