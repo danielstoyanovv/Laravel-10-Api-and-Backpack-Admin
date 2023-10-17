@@ -1,4 +1,3 @@
------------------------------------------------------ Project integrations -----------------------------------------------------
 ----------------------------------------------------- admin integrations -----------------------------------------------------
 app/Http/Controllers/Admin/PostCrudController.php - admin posts controller
 app/Http/Controllers/Admin/UserCrudController.php - admin users controller
