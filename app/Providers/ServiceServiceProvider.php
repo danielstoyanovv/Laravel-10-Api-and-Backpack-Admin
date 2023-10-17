@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Services\ApiTokenService;
+use App\Services\OauthTokenAdapterService;
 use App\Interfaces\ApiTokenServiceInterface;
 use Illuminate\Support\ServiceProvider;
 
@@ -25,7 +25,7 @@ class ServiceServiceProvider extends ServiceProvider
     {
         $this->app->bind(
             ApiTokenServiceInterface::class,
-            ApiTokenService::class
+            OauthTokenAdapterService::class
         );
     }
 }

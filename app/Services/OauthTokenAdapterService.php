@@ -7,7 +7,7 @@ namespace App\Services;
 use App\Interfaces\ApiTokenServiceInterface;
 use Illuminate\Support\Facades\Http;
 
-class ApiTokenService implements ApiTokenServiceInterface
+class OauthTokenAdapterService implements ApiTokenServiceInterface
 {
     public $clientId;
     public $clientSecret;
@@ -15,8 +15,8 @@ class ApiTokenService implements ApiTokenServiceInterface
     public $password;
 
     /**
-     * @param int $clientId
-     * @return $this
+     * @param int $clientId`
+     * @return $this`
      */
     public function setClientId(int $clientId): self
     {
@@ -34,12 +34,20 @@ class ApiTokenService implements ApiTokenServiceInterface
         return $this;
     }
 
+    /**
+     * @param string $email
+     * @return $this
+     */
     public function setEmail(string $email): self
     {
         $this->email = $email;
         return $this;
     }
 
+    /**
+     * @param string $password
+     * @return $this
+     */
     public function setPassword(string $password): self
     {
         $this->password = $password;
@@ -49,7 +57,7 @@ class ApiTokenService implements ApiTokenServiceInterface
     /**
      * @return mixed
      */
-    public function getBearer()
+    public function getToken(): mixed
     {
         $responseToken = Http::timeout(9999999)->post('http://127.0.0.1:8000/oauth/token', [
             "grant_type" => "password",

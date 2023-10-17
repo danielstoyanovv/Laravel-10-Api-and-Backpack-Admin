@@ -40,7 +40,7 @@ class ApiTokensController extends Controller
                      ->setClientSecret($client->secret)
                      ->setEmail($user->email)
                      ->setPassword(request('password'))
-                     ->getBearer();
+                     ->getToken();
                 return response()->json([
                     'success' => 1,
                     'token' => $tokenResult['access_token']
