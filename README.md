@@ -1,6 +1,8 @@
 ----------------------------------------------------- admin integrations -----------------------------------------------------
 app/Http/Controllers/Admin/PostCrudController.php - admin posts controller
+
 app/Http/Controllers/Admin/UserCrudController.php - admin users controller
+
 app/Http/Controllers/Backpack/CRUD/AdminController.php - admin controller
 ----------------------------------------------------- rest api integrations -----------------------------------------------------
 app/Http/Controllers/Api/ApiTokensController.php - api token controller
