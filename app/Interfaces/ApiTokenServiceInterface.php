@@ -5,23 +5,23 @@ namespace App\Interfaces;
 interface ApiTokenServiceInterface
 {
     /**
-     * @param int $clientId
-     * @return \App\Services\ApiTokenService
+     * @param int $clientId `
+     * @return $this`
      */
-    public function setClientId(int $clientId): \App\Services\ApiTokenService;
+    public function setClientId(int $clientId): self;
 
     /**
      * @param string $clientSecret
      * @return $this
      */
-    public function setClientSecret(string $clientSecret): \App\Services\ApiTokenService;
+    public function setClientSecret(string $clientSecret): self;
 
-    public function setEmail(string $email): \App\Services\ApiTokenService;
+    public function setEmail(string $email): self;
 
-    public function setPassword(string $password): \App\Services\ApiTokenService;
+    public function setPassword(string $password): self;
 
     /**
      * @return mixed
      */
-    public function getBearer();
+    public function getToken(): mixed;
 }
