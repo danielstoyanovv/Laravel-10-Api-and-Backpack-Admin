@@ -1,6 +1,5 @@
 ----------------------------------------------------- project integrations -----------------------------------------------------
 
-
 ------------- admin -------------
 
 app/Http/Controllers/Admin/PostCrudController.php - admin posts controller
