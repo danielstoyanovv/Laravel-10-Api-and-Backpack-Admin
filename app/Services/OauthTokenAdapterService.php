@@ -15,7 +15,7 @@ class OauthTokenAdapterService implements ApiTokenServiceInterface
     public $password;
 
     /**
-     * @param int $clientId`
+     * @param int $clientId
      * @return $this`
      */
     public function setClientId(int $clientId): self

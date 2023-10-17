@@ -6,7 +6,7 @@ interface ApiTokenServiceInterface
 {
     /**
      * @param int $clientId `
-     * @return $this`
+     * @return $this
      */
     public function setClientId(int $clientId): self;
 
