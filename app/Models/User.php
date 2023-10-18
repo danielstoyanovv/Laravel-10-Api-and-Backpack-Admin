@@ -12,6 +12,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\File;
 
 class User extends Authenticatable
 {
@@ -68,6 +69,7 @@ class User extends Authenticatable
      */
     public function setImageAttribute($value)
     {
+        File::delete($this->attributes['image']);
         $this->attributes['image'] = $value instanceof UploadedFile ? Upload::process($value) : $value;
     }
 
