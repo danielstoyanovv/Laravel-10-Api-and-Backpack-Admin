@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class UserRegistered extends Mailable
+class AdminNotification extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -43,7 +43,7 @@ class UserRegistered extends Mailable
     public function content()
     {
         return new Content(
-            markdown: 'emails.user.registered',
+            markdown: 'emails.admin.notification',
             with: [
                 'name' => $this->name,
                 'email' => $this->email,

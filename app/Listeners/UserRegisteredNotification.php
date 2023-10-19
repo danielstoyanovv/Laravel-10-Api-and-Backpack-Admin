@@ -31,7 +31,7 @@ class UserRegisteredNotification
         $adminUsers = User::where('is_admin', 1)->get();
         if ($adminUsers->count() > 0) {
             foreach ($adminUsers as $adminUser) {
-                $email = new \App\Mail\UserRegistered($event->name, $event->email);
+                $email = new \App\Mail\AdminNotification($event->name, $event->email);
                 Mail::to($adminUser->email)->send($email);
             }
         }
