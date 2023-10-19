@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\UserRegistered;
 use App\Helpers\ApiData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserActivateRequest;
@@ -42,6 +43,7 @@ class UsersController extends Controller
             $accessToken = $user->createToken('MyApp')->accessToken;
             $success['token'] = $accessToken;
             $success['name'] =  $user->name;
+            UserRegistered::dispatch($user->name, $user->email);
             return new UsersResource($user);
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());

@@ -69,7 +69,9 @@ class User extends Authenticatable
      */
     public function setImageAttribute($value)
     {
-        File::delete($this->attributes['image']);
+        if (!empty($this->attributes['image'])) {
+            File::delete($this->attributes['image']);
+        }
         $this->attributes['image'] = $value instanceof UploadedFile ? Upload::process($value) : $value;
     }
 
