@@ -28,7 +28,7 @@ class UserRegisteredNotification
      */
     public function handle(UserRegistered $event)
     {
-        $adminUsers = User::select('name', 'email')->where('is_admin', 1)->get();
+        $adminUsers = User::where('is_admin', 1)->get();
         if ($adminUsers->count() > 0) {
             foreach ($adminUsers as $adminUser) {
                 $email = new \App\Mail\UserRegistered($event->name, $event->email);
