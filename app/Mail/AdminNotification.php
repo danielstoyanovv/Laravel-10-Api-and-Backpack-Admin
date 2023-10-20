@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
@@ -31,7 +33,7 @@ class AdminNotification extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: 'New user is registered',
+            subject: 'Admin Notification',
         );
     }
 
