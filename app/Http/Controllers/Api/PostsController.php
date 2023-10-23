@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\DTO\PostDTO;
 use App\Helpers\ApiData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DeletedAtClearRequest;
@@ -58,7 +59,7 @@ class PostsController extends Controller
                 }
                 $postService = App::make(PostServiceInterface::class);
 
-                $post = $postService->create($user);
+                $post = $postService->create(new PostDTO(request('author'), request('content'), $user));
                 return new PostsResource($post);
             }
             return response()->json(['error' => 'not found'], ResponseAlias::HTTP_NOT_FOUND);

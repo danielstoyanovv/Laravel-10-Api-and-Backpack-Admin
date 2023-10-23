@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\DTO\UserDTO;
 use App\Events\UserRegistered;
 use App\Helpers\ApiData;
 use App\Http\Controllers\Controller;
@@ -40,7 +41,10 @@ class UsersController extends Controller
         try {
             $usersImage = $this->handleImage();
             $userService = App::make(UserServiceInterface::class);
-            $user = $userService->create($usersImage ?? null);
+            $userDTO = new UserDTO(request('name'), request('email'), request('password'),
+            'inactive', $usersImage ?? null, request('short_description'));
+
+            $user = $userService->create($userDTO);
             $accessToken = $user->createToken('MyApp')->accessToken;
             $success['token'] = $accessToken;
             $success['name'] =  $user->name;

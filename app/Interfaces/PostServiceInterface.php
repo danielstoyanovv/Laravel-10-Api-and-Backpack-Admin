@@ -2,14 +2,13 @@
 
 namespace App\Interfaces;
 
-use App\Models\User;
-use Illuminate\Contracts\Auth\Authenticatable;
+use App\DTO\PostDTO;
 
 interface PostServiceInterface
 {
     /**
-     * @param User|Authenticatable $user
+     * @param PostDTO $postDTO
      * @return mixed
      */
-    public function create(User|Authenticatable $user): mixed;
+    public function create(PostDTO $postDTO): mixed;
 }
