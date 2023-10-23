@@ -7,6 +7,10 @@ namespace App\Providers;
 use App\Services\OauthTokenAdapterService;
 use App\Interfaces\ApiTokenServiceInterface;
 use Illuminate\Support\ServiceProvider;
+use App\Services\PostService;
+use App\Interfaces\PostServiceInterface;
+use App\Services\UserService;
+use App\Interfaces\UserServiceInterface;
 
 class ServiceServiceProvider extends ServiceProvider
 {
@@ -26,6 +30,16 @@ class ServiceServiceProvider extends ServiceProvider
         $this->app->bind(
             ApiTokenServiceInterface::class,
             OauthTokenAdapterService::class
+        );
+
+        $this->app->bind(
+            PostServiceInterface::class,
+            PostService::class
+        );
+
+        $this->app->bind(
+            UserServiceInterface::class,
+            UserService::class
         );
     }
 }

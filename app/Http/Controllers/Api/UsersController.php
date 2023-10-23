@@ -10,10 +10,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UserActivateRequest;
 use App\Http\Requests\UserCreateRequest;
 use App\Http\Requests\UserUpdateRequest;
-use App\Interfaces\UserRepositoryInterfaces;
+use App\Interfaces\UserServiceInterface;
 use App\Models\User;
 use App\Http\Resources\UsersResource;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Illuminate\Http\JsonResponse;
@@ -32,14 +33,14 @@ class UsersController extends Controller
 
     /**
      * @param UserCreateRequest $request
-     * @param UserRepositoryInterfaces $repository
      * @return UsersResource|JsonResponse
      */
-    public function store(UserCreateRequest $request, UserRepositoryInterfaces $repository): UsersResource|JsonResponse
+    public function store(UserCreateRequest $request): UsersResource|JsonResponse
     {
         try {
             $usersImage = $this->handleImage();
-            $user = $repository->create($usersImage ?? null);
+            $userService = App::make(UserServiceInterface::class);
+            $user = $userService->create($usersImage ?? null);
             $accessToken = $user->createToken('MyApp')->accessToken;
             $success['token'] = $accessToken;
             $success['name'] =  $user->name;

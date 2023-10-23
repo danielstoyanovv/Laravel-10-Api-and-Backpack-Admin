@@ -10,11 +10,12 @@ use App\Http\Requests\DeletedAtClearRequest;
 use App\Http\Requests\PostCreateRequest;
 use App\Http\Requests\PostLikeRequest;
 use App\Http\Resources\PostsResource;
-use App\Interfaces\PostRepositoryInterface;
+use App\Interfaces\PostServiceInterface;
 use App\Models\Post;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
@@ -46,17 +47,18 @@ class PostsController extends Controller
 
     /**
      * @param PostCreateRequest $request
-     * @param PostRepositoryInterface $repository
      * @return PostsResource|JsonResponse
      */
-    public function store(PostCreateRequest $request, PostRepositoryInterface $repository): PostsResource|JsonResponse
+    public function store(PostCreateRequest $request): PostsResource|JsonResponse
     {
         try {
             if ($user = auth()->user()) {
                 if (!$this->apiData->isUserActive($user)) {
                     return response()->json(['error' => 'User is inactive'], ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
                 }
-                $post = $repository->create($user);
+                $postService = App::make(PostServiceInterface::class);
+
+                $post = $postService->create($user);
                 return new PostsResource($post);
             }
             return response()->json(['error' => 'not found'], ResponseAlias::HTTP_NOT_FOUND);
